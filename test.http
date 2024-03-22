@@ -36,8 +36,27 @@ content-type: application/json
         ]
 }
 
+### 
+
+#
+GET http://localhost:8000/api/v1/sellers/ HTTP/1.1
 ###
 
+
+# Получаем по id
+GET http://localhost:8000/api/v1/sellers/1 HTTP/1.1
+###
+
+#Проверка PUT
+PUT http://localhost:8000/api/v1/sellers/1 HTTP/1.1
+content-type: application/json
+
+{
+    "first_name": "Test update",
+    "last_name": "Robert Mar",
+    "email": "21011975mail@gmail.com"
+}
+###
 
 # Получаем список книг
 GET http://localhost:8000/api/v1/books/ HTTP/1.1
@@ -60,7 +79,10 @@ content-type: application/json
     "year": 2007,
     "id": 0
 }
+###
 
+#Удалить продавца
+DELETE http://localhost:8000/api/v1/sellers/1 HTTP/1.1
 ###
 
 # Удаляем книгу

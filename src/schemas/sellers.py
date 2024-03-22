@@ -19,20 +19,26 @@ class IncomingSeller(BaseSeller):
     books: List[IncomingBook]
     password: str
 
-    # todo:  просмотреть, что таких в базе данных нет.
-    # @field_validator("books")
-    # @staticmethod
-    # def books(books: List[IncomingBook]) -> List[IncomingBook]:
-    #     for book in books:
-    #         raise PydanticCustomError("Validation error", f"{book} already in store!")
-    #     return books
+    @field_validator("first_name")
+    @staticmethod
+    def first_name_validator(first_name: str) -> str:
+        if first_name is None or len(first_name) == 0:
+            raise PydanticCustomError("Validation error", f"First name can't be empty.")
+        return first_name
 
-    # @field_validator("password")
-    # @staticmethod
-    # def books(passw: str) -> str:
-    #     if passw is None or len(passw) == 0:
-    #         raise PydanticCustomError("Validation error", f"password can't be empty.")
-    #     return passw
+    @field_validator("last_name")
+    @staticmethod
+    def second_name_validator(last_name: str) -> str:
+        if last_name is None or len(last_name) == 0:
+            raise PydanticCustomError("Validation error", f"last name can't be empty.")
+        return last_name
+
+    @field_validator("password")
+    @staticmethod
+    def password_validator(passw: str) -> str:
+        if passw is None or len(passw) == 0:
+            raise PydanticCustomError("Validation error", f"password can't be empty.")
+        return passw
 
 
 # Класс, валидирующий исходящие данные. Он уже содержит id
@@ -43,4 +49,4 @@ class ReturnedSeller(BaseSeller):
 
 # Класс для возврата массива объектов "Книга"
 class ReturnedAllSellers(BaseModel):
-    sellers: list[ReturnedSeller]
+    sellers: list[ReturnedSeller] = []

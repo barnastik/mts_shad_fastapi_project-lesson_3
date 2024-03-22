@@ -1,12 +1,13 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response, status
-
+from sqlalchemy import delete
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 import icecream as ic
 from src.configurations.database import get_async_session
 from src.models.books import Book
+from src.models.sellers import Seller
 from src.schemas import IncomingBook, ReturnedAllBooks, ReturnedBook
 
 # todo: Make connect with sellers __PS
@@ -64,12 +65,25 @@ async def get_book(book_id: int, session: DBSession):
 # Ручка для удаления книги
 @books_router.delete("/{book_id}")
 async def delete_book(book_id: int, session: DBSession):
-    deleted_book = await session.get(Book, book_id)
-    ic(deleted_book)  # Красивая и информативная замена для print. Полезна при отладке.
-    if deleted_book:
-        await session.delete(deleted_book)
+    # deleted_book = await session.get(Book, book_id)
+    # ic(deleted_book)  # Красивая и информативная замена для print. Полезна при отладке.
+    # if deleted_book:
+    #     await session.delete(deleted_book)
+    #
+    # return Response(status_code=status.HTTP_204_NO_CONTENT)  # Response может вернуть текст и метаданные.
+    book = await session.execute(select(Book).filter(Book.id == book_id))
+    if not book.scalar():
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
 
-    return Response(status_code=status.HTTP_204_NO_CONTENT)  # Response может вернуть текст и метаданные.
+        # Удаляем книгу из базы данных
+    await session.execute(delete(Book).where(Book.id == book_id))
+
+    # Удаляем связь книги с продавцом
+    await session.execute(
+        delete(Seller).where(Seller.books.any(id=book_id))
+    )
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 # Ручка для обновления данных о книге
